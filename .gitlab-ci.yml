@@ -1,35 +1,122 @@
-# This is how a comment is added to a YAML file; please read them carefully.
-#
- 
-stages:         # Dictionary
- - build        # this is build stage
- - test         # this is test stage
- - integration  # this is an integration stage
- - staging      # this is the staging step
- - prod         # this is prod/production stage
- 
+image: docker:latest
+
+services:
+  - docker:dind
+
+stages:
+  - build
+  - test
+  - release
+  - preprod
+  - integration
+  - prod
+
 build:
-  stage: build  # this job belongs to the build stage.
+  stage: build
+  image: python:3.6
+  before_script:
+   - pip3 install --upgrade virtualenv
   script:
-    - echo "This is a build step."  # We are running an echo command, but it can be any command.
- 
+   - virtualenv env
+   - source env/bin/activate
+   - pip install -r requirements.txt
+   - python manage.py check
+
 test:
   stage: test
+  image: python:3.6
+  before_script:
+   - pip3 install --upgrade virtualenv
   script:
-    - echo "This is a test step."
- 
- 
-integration:          
+   - virtualenv env
+   - source env/bin/activate
+   - pip install -r requirements.txt
+   - python manage.py test taskManager
+
+# Software Component Analysis
+sca-frontend:
+  stage: build
+  image: node:alpine3.10
+  script:
+    - npm install
+    - npm install -g retire # Install retirejs npm package.
+    - retire --outputformat json --outputpath retirejs-report.json --severity high --exitwith 0
+  artifacts:
+    paths: [retirejs-report.json]
+    when: always # What is this for?
+    expire_in: one week
+
+sca-backend:
+  stage: build
+  script:
+    - docker pull hysnsec/safety
+    - docker run --rm -v $(pwd):/src hysnsec/safety check -r requirements.txt --json > oast-results.json
+  artifacts:
+    paths: [oast-results.json]
+    when: always # What does this do?
+  allow_failure: true #<--- allow the build to fail but don't mark it as such
+
+# Git Secrets Scanning
+secrets-scanning:
+  stage: build
+  script:
+    - apk add git
+    - git checkout master
+    - docker run -v $(pwd):/src --rm hysnsec/trufflehog file:///src --json | tee trufflehog-output.json
+  artifacts:
+    paths: [trufflehog-output.json]
+    when: always # What is this for?
+    expire_in: one week
+  allow_failure: true   #<--- allow the build to fail but don't mark it as such
+
+# Static Application Security Testing
+sast:
+  stage: build
+  script:
+    - docker pull hysnsec/bandit  # Download bandit docker container
+    # Run docker container, please refer docker security course, if this doesn't make sense to you.
+    - docker run --user $(id -u):$(id -g) -v $(pwd):/src --rm hysnsec/bandit -r /src -f json -o /src/bandit-output.json
+  artifacts:
+    paths: [bandit-output.json]
+    when: always
+  allow_failure: true   #<--- allow the build to fail but don't mark it as such
+
+# Dynamic Application Security Testing
+nikto:
   stage: integration
   script:
-    - echo "This is an integration step."
+    - docker pull hysnsec/nikto
+    - docker run --rm -v $(pwd):/tmp hysnsec/nikto -h django-nv.conkelhomelab.net -o /tmp/nikto-output.xml
+  artifacts:
+    paths: [nikto-output.xml]
+    when: always
 
-staging:
-  stage: staging
+sslscan:
+  stage: integration
   script:
-    - echo "This is a staging step."
- 
-prod:
-  stage: prod
+    - docker pull hysnsec/sslyze
+    - docker run --rm -v $(pwd):/tmp hysnsec/sslyze --regular django-nv.conkelhomelab.net:443 --json_out /tmp/sslyze-output.json
+  artifacts:
+    paths: [sslyze-output.json]
+    when: always
+
+nmap:
+  stage: integration
   script:
-    - echo "This is a deploy step."
+    - docker pull hysnsec/nmap
+    - docker run --rm -v $(pwd):/tmp hysnsec/nmap django-nv.conkelhomelab.net -oX /tmp/nmap-output.xml
+  artifacts:
+    paths: [nmap-output.xml]
+    when: always
+
+zap-baseline:
+  stage: integration
+  script:
+    - docker pull owasp/zap2docker-stable:2.10.0
+    - docker run --user $(id -u):$(id -g) --rm -v $(pwd):/zap/wrk:rw owasp/zap2docker-stable:2.10.0 zap-baseline.py -t https://django-nv.conkelhomelab.net -J zap-output.json
+  after_script:
+    - docker rmi owasp/zap2docker-stable:2.10.0  # clean up the image to save the disk space
+  artifacts:
+    paths: [zap-output.json]
+    when: always # What does this do?
+  allow_failure: false
