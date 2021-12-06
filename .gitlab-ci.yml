@@ -51,6 +51,7 @@ sca-backend:
   script:
     - echo ${CI_PROJECT_DIR}
     - echo $(pwd)
+    - echo $(ls -al)
     - docker pull hysnsec/safety
     - docker run --rm -v $(pwd):/src hysnsec/safety check -r requirements.txt --json > oast-results.json
   artifacts:
