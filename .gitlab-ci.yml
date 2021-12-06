@@ -90,6 +90,7 @@ nikto:
   artifacts:
     paths: [nikto-output.xml]
     when: always
+  allow_failure: true
 
 sslscan:
   stage: integration
@@ -99,6 +100,7 @@ sslscan:
   artifacts:
     paths: [sslyze-output.json]
     when: always
+  allow_failure: true
 
 nmap:
   stage: integration
@@ -108,6 +110,7 @@ nmap:
   artifacts:
     paths: [nmap-output.xml]
     when: always
+  allow_failure: true
 
 zap-baseline:
   stage: integration
@@ -119,4 +122,4 @@ zap-baseline:
   artifacts:
     paths: [zap-output.json]
     when: always # What does this do?
-  allow_failure: false
+  allow_failure: true
