@@ -5,10 +5,9 @@ import os
 import requests
 
 def upload_results(host, user, api_key, scanner, result_file, engagement_id, verify=False): # set verify to False if ssl cert is self-signed
-     API_URL = "http://"+host+"/api/v1"
-     IMPORT_SCAN_URL = API_URL+ "/importscan/"
-     AUTH_TOKEN = "ApiKey " + user + ":" + api_key
-
+	API_URL = "http://"+host+"/api/v1"
+	IMPORT_SCAN_URL = API_URL+ "/importscan/"
+	AUTH_TOKEN = "ApiKey " + user + ":" + api_key
 	headers = dict()
 	json = dict()
 	files = dict()
