@@ -112,14 +112,17 @@ nmap:
     when: always
   allow_failure: true
 
-zap-baseline:
-  stage: integration
+zap_scan:
+  stage: build
+  before_script:
+    - apk add py-pip
+    - pip3 install requests
   script:
     - docker pull owasp/zap2docker-stable:2.10.0
-    - docker run --user $(id -u):$(id -g) --rm -v $(pwd):/zap/wrk:rw owasp/zap2docker-stable:2.10.0 zap-baseline.py -t https://django-nv.conkelhomelab.net -J zap-output.json
+    - docker run --user $(id -u):$(id -g) -w /zap -v $(pwd):/zap/wrk:rw --rm owasp/zap2docker-stable:2.10.0 zap-baseline.py -t https://django-nv.conkelhomelab.net -x zap-output.xml
   after_script:
-    - docker rmi owasp/zap2docker-stable:2.10.0  # clean up the image to save the disk space
+    - python3 upload-results.py --host defectdojo.conkelhomelab.net --api_key 2db6bfb724fe00b48637d1e183075fa66c754807 --engagement_id 1 --product_id 1 --lead_id 1 --environment "Production" --result_file zap-output.xml --scanner "ZAP Scan"
   artifacts:
-    paths: [zap-output.json]
-    when: always # What does this do?
+    paths: [zap-output.xml]
+    when: always
   allow_failure: true
