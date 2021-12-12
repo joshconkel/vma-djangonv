@@ -43,8 +43,20 @@ sca-frontend:
     - retire --outputformat json --outputpath retirejs-report.json --severity high --exitwith 0
   artifacts:
     paths: [retirejs-report.json]
-    when: always # What is this for?
+    when: always # Archive even on exit code failure
     expire_in: one week
+  allow_failure: true #<--- allow the build to fail but don't mark it as such
+
+sca-syft:
+  stage: build
+  image: anchore/syft:latest
+  script:
+    - syft packages alpine:latest -o json --scope all-layers > syft-packages.json
+  artifacts:
+    paths: [syft-packages.json]
+    when: always # Archive even on exit code failure
+    expire_in: one week
+  allow_failure: true #<--- allow the build to fail but don't mark it as such
 
 sca-backend:
   stage: build
@@ -53,7 +65,7 @@ sca-backend:
     - docker run --rm -v $(pwd):/src hysnsec/safety check -r requirements.txt --json > oast-results.json
   artifacts:
     paths: [oast-results.json]
-    when: always # What does this do?
+    when: always # Archive even on exit code failure
   allow_failure: true #<--- allow the build to fail but don't mark it as such
 
 sonarqube-check:
