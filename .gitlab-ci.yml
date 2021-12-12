@@ -57,7 +57,7 @@ sca-backend:
   allow_failure: true #<--- allow the build to fail but don't mark it as such
 
 sonarqube-check:
-  stage: test
+  stage: build
   image: sonarsource/sonar-scanner-cli:latest
   variables:
     SONAR_TOKEN: "bd43508e8637f8e7525f9eb04ca96e74a220d320"
@@ -65,7 +65,7 @@ sonarqube-check:
     SONAR_PROJECT_BASE_DIR: "${CI_PROJECT_DIR}"
     GIT_DEPTH: 0
   script:
-    - sonar-scanner -Dsonar.qualitygate.wait=true
+    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.projectKey=DjangoNV
   allow_failure: true
   only:
     - merge_requests
