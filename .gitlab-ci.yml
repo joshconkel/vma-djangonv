@@ -49,9 +49,9 @@ sca-frontend:
 
 sca-syft:
   stage: build
-  image: anchore/syft:latest
   script:
-    - syft packages alpine:latest -o json --scope all-layers > syft-packages.json
+    - docker pull anchore/syft
+    - docker run --rm -v $(pwd):/src anchore/syft packages alpine:latest -o json --scope all-layers > syft-packages.json
   artifacts:
     paths: [syft-packages.json]
     when: always # Archive even on exit code failure
