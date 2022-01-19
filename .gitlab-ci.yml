@@ -148,7 +148,7 @@ zap_scan:
     - docker pull owasp/zap2docker-stable:2.10.0
     - docker run --user $(id -u):$(id -g) -w /zap -v $(pwd):/zap/wrk:rw --rm owasp/zap2docker-stable:2.10.0 zap-baseline.py -t https://django-nv.conkelhomelab.net -x zap-output.xml
   after_script:
-    - python3 upload-results.py --host defectdojo.conkelhomelab.net --api_key 2db6bfb724fe00b48637d1e183075fa66c754807 --username admin --engagement_id 3 --product_id 1 --result_file zap-output.xml --scanner "ZAP Scan"
+    - python3 upload-results.py --host defectdojo.conkelhomelab.net --api_key 31303ee73ed242b2d35711026631528a07e9a8fa --username defectdojo --engagement_id 1 --product_id 1 --result_file zap-output.xml --scanner "ZAP Scan"
   artifacts:
     paths: [zap-output.xml]
     when: always
