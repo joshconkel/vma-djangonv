@@ -4,17 +4,17 @@ import json
 import os
 import requests
 
-def upload_results(host, user, api_key, scanner, result_file, engagement_id, verify=True): # set verify to False if ssl cert is self-signed
-    API_URL = "https://"+host+"/api/v2"
-    IMPORT_SCAN_URL = API_URL+ "/importscan/"
-    AUTH_TOKEN = "ApiKey " + user + ":" + api_key
+def upload_results(host, api_key, scanner, result_file, engagement_id, verify=True): # set verify to False if ssl cert is self-signed
+    API_URL = "https://" + host + "/api/v2"
+    IMPORT_SCAN_URL = API_URL+ "/import-scan/"
+    AUTH_TOKEN = "Token " + api_key
 
     headers = dict()
     json = dict()
     files = dict()
 
     # Prepare headers
-    # headers = {'Authorization': 'ApiKey dojo:3e24a3ee5af0305af20a5e6224052de3ed2f6859'}
+    # headers = {'Authorization': 'Token 3e24a3ee5af0305af20a5e6224052de3ed2f6859'}
     headers['Authorization'] = AUTH_TOKEN
     print(headers)
 
@@ -25,8 +25,9 @@ def upload_results(host, user, api_key, scanner, result_file, engagement_id, ver
     #   "verified": False,
     #   "tags": "",
     #   "active": False,
-    #   "engagement": "/api/v1/engagements/2/",
-    #   "lead":"/api/v1/users/1/",
+    #   "engagement": 2,
+    #   "product_id": 1,
+    #   "lead": 1,
     #   "scan_type": "Bandit Scan"
     # }
     json['minimum_severity'] = "Low"
@@ -34,8 +35,8 @@ def upload_results(host, user, api_key, scanner, result_file, engagement_id, ver
     json['verified'] = False
     json['tags'] = ""
     json['active'] = False
-    json['engagement'] = "/api/v2/engagements/"+ engagement_id + "/"
-    json['lead'] ="/api/v2/users/"+ "1" + "/"
+    json['engagement'] = engagement_id
+    json['lead'] = 1
     json['scan_type'] = scanner
     print(json)
 
@@ -55,7 +56,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='CI/CD integration for DefectDojo')
     parser.add_argument('--host', help="DefectDojo Hostname", required=True)
     parser.add_argument('--api_key', help="API Key", required=True)
-    parser.add_argument('--username', help="Username of Defect dojo user", required=True)
     parser.add_argument('--engagement_id', help="Engagement ID (optional)", required=True)
     parser.add_argument('--result_file', help="Scanner file", required=True)
     parser.add_argument('--scanner', help="Type of scanner", required=True)
@@ -66,15 +66,14 @@ if __name__ == "__main__":
     args = vars(parser.parse_args())
     host = args["host"]
     api_key = args["api_key"]
-    user = args["username"]
     product_id = args["product_id"]
     result_file = args["result_file"]
     scanner = args["scanner"]
     engagement_id = args["engagement_id"]
     build_id = args["build_id"]
 
-    # upload_results(self, host, user, api_key, scanner, result_file, engagement_id, verify=False): # set verify to False if ssl cert is self-signed
-    result = upload_results(host, user, api_key, scanner, result_file, engagement_id)
+    # upload_results(self, host, api_key, scanner, result_file, engagement_id, verify=False): # set verify to False if ssl cert is self-signed
+    result = upload_results(host, api_key, scanner, result_file, engagement_id)
 
     if result == 201 :
          print("Successfully uploaded the results to Defect Dojo")
