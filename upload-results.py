@@ -30,18 +30,18 @@ def upload_results(host, api_key, scanner, result_file, engagement_id, verify=Tr
     #   "lead": 1,
     #   "scan_type": "Bandit Scan"
     # }
-    json['minimum_severity'] = "Low"
-    json['scan_date'] = datetime.now().strftime("%Y-%m-%d")
-    json['verified'] = False
-    json['tags'] = ""
-    json['active'] = False
-    json['engagement'] = engagement_id
-    json['lead'] = 1
-    json['scan_type'] = scanner
+    json["minimum_severity"] = "Low"
+    json["scan_date"] = datetime.now().strftime("%Y-%m-%d")
+    json["verified"] = False
+    json["tags"] = "[]"
+    json["active"] = False
+    json["engagement"] = engagement_id
+    json["lead"] = "1"
+    json["scan_type"] = scanner
     print(json)
 
     # Prepare file data to send to API
-    files['file'] = open(result_file)
+    files["file"] = open(result_file)
 
     # Make a request to API
     response = requests.post(IMPORT_SCAN_URL, headers=headers, files=files, data=json, verify=verify)
