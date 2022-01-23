@@ -41,6 +41,8 @@ sca-frontend:
     - npm install
     - npm install -g retire # Install retirejs npm package.
     - retire --outputformat json --outputpath retirejs-report.json --severity high --exitwith 0
+  after_script:
+    - python3 upload-results.py --host defectdojo.conkelhomelab.net --api_key ec150e0e6ca3dc537d535b18a03f363ae2617ccc --engagement_id 1 --product_id 1 --result_file retirejs-report.json --scanner "Retire.js Scan"
   artifacts:
     paths: [retirejs-report.json]
     when: always # Archive even on exit code failure
@@ -90,6 +92,8 @@ secrets-scanning:
     - apk add git
     - git checkout master
     - docker run -v $(pwd):/src --rm hysnsec/trufflehog file:///src --json | tee trufflehog-output.json
+  after_script:
+    - python3 upload-results.py --host defectdojo.conkelhomelab.net --api_key ec150e0e6ca3dc537d535b18a03f363ae2617ccc --engagement_id 1 --product_id 1 --result_file trufflehog-output.json --scanner "Trufflehog Scan"
   artifacts:
     paths: [trufflehog-output.json]
     when: always # What is this for?
@@ -103,6 +107,8 @@ sast:
     - docker pull hysnsec/bandit  # Download bandit docker container
     # Run docker container, please refer docker security course, if this doesn't make sense to you.
     - docker run --user $(id -u):$(id -g) -v $(pwd):/src --rm hysnsec/bandit -r /src -f json -o /src/bandit-output.json
+  after_script:
+    - python3 upload-results.py --host defectdojo.conkelhomelab.net --api_key ec150e0e6ca3dc537d535b18a03f363ae2617ccc --engagement_id 1 --product_id 1 --result_file bandit-output.json --scanner "Bandit Scan"
   artifacts:
     paths: [bandit-output.json]
     when: always
@@ -114,6 +120,8 @@ nikto:
   script:
     - docker pull hysnsec/nikto
     - docker run --rm -v $(pwd):/tmp hysnsec/nikto -h django-nv.conkelhomelab.net -o /tmp/nikto-output.xml
+  after_script:
+    - python3 upload-results.py --host defectdojo.conkelhomelab.net --api_key ec150e0e6ca3dc537d535b18a03f363ae2617ccc --engagement_id 1 --product_id 1 --result_file nikto-output.xml --scanner "Nikto Scan"
   artifacts:
     paths: [nikto-output.xml]
     when: always
@@ -123,9 +131,11 @@ sslscan:
   stage: integration
   script:
     - docker pull hysnsec/sslyze
-    - docker run --rm -v $(pwd):/tmp hysnsec/sslyze --regular django-nv.conkelhomelab.net:443 --json_out /tmp/sslyze-output.json
+    - docker run --rm -v $(pwd):/tmp hysnsec/sslyze --regular django-nv.conkelhomelab.net:443 --xml_out /tmp/sslyze-output.xml
+  after_script:
+    - python3 upload-results.py --host defectdojo.conkelhomelab.net --api_key ec150e0e6ca3dc537d535b18a03f363ae2617ccc --engagement_id 1 --product_id 1 --result_file sslyze-output.xml --scanner "Sslyze Scan"
   artifacts:
-    paths: [sslyze-output.json]
+    paths: [sslyze-output.xml]
     when: always
   allow_failure: true
 
