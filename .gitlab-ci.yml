@@ -40,6 +40,7 @@ sca-frontend:
   script:
     - npm install
     - npm install -g retire # Install retirejs npm package.
+    - apk add python3
     - retire --outputformat json --outputpath retirejs-report.json --severity high --exitwith 0
   after_script:
     - python3 upload-results.py --host defectdojo.conkelhomelab.net --api_key ec150e0e6ca3dc537d535b18a03f363ae2617ccc --engagement_id 1 --product_id 1 --result_file retirejs-report.json --scanner "Retire.js Scan"
