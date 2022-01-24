@@ -92,6 +92,9 @@ sonarqube-check:
 # Git Secrets Scanning
 secrets-scanning:
   stage: build
+  before_script:
+    - apk add python3 py3-pip
+    - pip3 install requests 
   script:
     - apk add git
     - git checkout master
@@ -105,8 +108,11 @@ secrets-scanning:
   allow_failure: true   #<--- allow the build to fail but don't mark it as such
 
 # Static Application Security Testing
-sast:
+bandit-scan:
   stage: build
+  before_script:
+    - apk add python3 py3-pip
+    - pip3 install requests 
   script:
     - docker pull hysnsec/bandit  # Download bandit docker container
     # Run docker container, please refer docker security course, if this doesn't make sense to you.
@@ -121,6 +127,9 @@ sast:
 # Dynamic Application Security Testing
 nikto:
   stage: integration
+  before_script:
+    - apk add python3 py3-pip
+    - pip3 install requests 
   script:
     - docker pull hysnsec/nikto
     - docker run --rm -v $(pwd):/tmp hysnsec/nikto -h django-nv.conkelhomelab.net -o /tmp/nikto-output.xml
@@ -133,6 +142,9 @@ nikto:
 
 sslscan:
   stage: integration
+  before_script:
+    - apk add python3 py3-pip
+    - pip3 install requests 
   script:
     - docker pull hysnsec/sslyze
     - docker run --rm -v $(pwd):/tmp hysnsec/sslyze --regular django-nv.conkelhomelab.net:443 --xml_out /tmp/sslyze-output.xml
@@ -145,6 +157,9 @@ sslscan:
 
 nmap:
   stage: integration
+  before_script:
+    - apk add python3 py3-pip
+    - pip3 install requests 
   script:
     - docker pull hysnsec/nmap
     - docker run --rm -v $(pwd):/tmp hysnsec/nmap django-nv.conkelhomelab.net -oX /tmp/nmap-output.xml
