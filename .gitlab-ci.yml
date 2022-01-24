@@ -96,7 +96,7 @@ secrets-scanning:
     - apk add python3 py3-pip git
     - pip3 install requests trufflehog trufflehog3 
   script:
-    - truffleHog --regex --entropy=False https://gitlab-temp.conkelhomelab.net/root/django.nv.git --json | tee trufflehog-output.json 
+    - trufflehog --regex --entropy=False https://gitlab-temp.conkelhomelab.net/root/django.nv.git --json | tee trufflehog-output.json 
   after_script:
     - python3 upload-results.py --host "$DD_HOST" --api_key "$DD_APIKEY"  --engagement_id 1 --product_id 1 --result_file trufflehog-output.json --scanner "Trufflehog Scan"
   artifacts:
