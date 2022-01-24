@@ -93,12 +93,13 @@ sonarqube-check:
 secrets-scanning:
   stage: build
   before_script:
-    - apk add python3 py3-pip
+    - apk add python3 py3-pip git
     - pip3 install requests 
   script:
-    - apk add git
     - git checkout master
-    - docker run -v $(pwd):/src --rm hysnsec/trufflehog file:///src --json | tee /src/trufflehog-output.json
+    - docker pull hysnsec/bandit
+    - docker run --user $(id -u):$(id -g) -v $(pwd):/src --rm hysnsec/trufflehog file:///src --json | tee /src/trufflehog-output.json
+    - which upload-results.py
   after_script:
     - python3 upload-results.py --host "$DD_HOST" --api_key "$DD_APIKEY"  --engagement_id 1 --product_id 1 --result_file trufflehog-output.json --scanner "Trufflehog Scan"
   artifacts:
