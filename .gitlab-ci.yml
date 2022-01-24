@@ -146,12 +146,12 @@ sslscan:
     - apk add python3 py3-pip
     - pip3 install requests 
   script:
-    - docker pull hysnsec/sslyze
-    - docker run --rm -v $(pwd):/tmp hysnsec/sslyze --regular django-nv.conkelhomelab.net:443 --xml_out /tmp/sslyze-output.xml
+    - docker pull nablac0d3/sslyze:5.0.2
+    - docker run --rm -v $(pwd):/tmp nablac0d3/sslyze:5.0.2 --regular django-nv.conkelhomelab.net:443  --json_out /tmp/sslyze-output.json
   after_script:
-    - python3 upload-results.py --host defectdojo.conkelhomelab.net --api_key ec150e0e6ca3dc537d535b18a03f363ae2617ccc --engagement_id 1 --product_id 1 --result_file sslyze-output.xml --scanner "Sslyze Scan"
+    - python3 upload-results.py --host defectdojo.conkelhomelab.net --api_key ec150e0e6ca3dc537d535b18a03f363ae2617ccc --engagement_id 1 --product_id 1 --result_file sslyze-output.json --scanner "Sslyze Scan"
   artifacts:
-    paths: [sslyze-output.xml]
+    paths: [sslyze-output.json]
     when: always
   allow_failure: true
 
