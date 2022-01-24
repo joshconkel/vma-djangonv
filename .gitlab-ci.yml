@@ -94,7 +94,7 @@ secrets-scanning:
   stage: build
   before_script:
     - apk add python3 py3-pip git
-    - pip3 install requests trufflehog trufflehog3 
+    - pip3 install requests trufflehog trufflehog3 gitpython
   script:
     - trufflehog --regex --entropy=False https://gitlab-temp.conkelhomelab.net/root/django.nv.git --json | tee trufflehog-output.json 
   after_script:
