@@ -146,8 +146,8 @@ sslscan:
     - apk add python3 py3-pip
     - pip3 install requests 
   script:
-    - docker pull nablac0d3/sslyze:5.0.2
-    - docker run --rm -v $(pwd):/tmp nablac0d3/sslyze:5.0.2 --regular django-nv.conkelhomelab.net:443  --json_out /tmp/sslyze-output.json
+    - docker pull hysnsec/sslyze
+    - docker run --rm -v $(pwd):/tmp hysnsec/sslyze --regular prod-IEtBDjyR.lab.practical-devsecops.training:443 --json_out /tmp/sslyze-output.json
   after_script:
     - python3 upload-results.py --host defectdojo.conkelhomelab.net --api_key ec150e0e6ca3dc537d535b18a03f363ae2617ccc --engagement_id 1 --product_id 1 --result_file sslyze-output.json --scanner "Sslyze Scan"
   artifacts:
