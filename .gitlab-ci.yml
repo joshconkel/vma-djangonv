@@ -78,7 +78,7 @@ sonarqube-check:
   stage: build
   image: sonarsource/sonar-scanner-cli:latest
   variables:
-    SONAR_TOKEN: "bd43508e8637f8e7525f9eb04ca96e74a220d320"
+    SONAR_TOKEN: "$SONAR_APIKEY"
     SONAR_HOST_URL: "https://sonarqube.conkelhomelab.net"
     SONAR_PROJECT_BASE_DIR: "${CI_PROJECT_DIR}"
     GIT_DEPTH: 0
