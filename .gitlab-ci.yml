@@ -38,7 +38,7 @@ sca-frontend:
   stage: build
   image: node:alpine3.10
   before_script:
-    - apk add python3 pip3
+    - apk add python3 py3-pip
     - pip3 install requests 
   script:
     - npm install
