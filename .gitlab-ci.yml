@@ -98,7 +98,7 @@ secrets-scanning:
   script:
     - apk add git
     - git checkout master
-    - docker run -v $(pwd):/src --rm hysnsec/trufflehog file:///src --json | tee trufflehog-output.json
+    - docker run -v $(pwd):/src --rm hysnsec/trufflehog file:///src --json | tee /src/trufflehog-output.json
   after_script:
     - python3 upload-results.py --host "$DD_HOST" --api_key "$DD_APIKEY"  --engagement_id 1 --product_id 1 --result_file trufflehog-output.json --scanner "Trufflehog Scan"
   artifacts:
