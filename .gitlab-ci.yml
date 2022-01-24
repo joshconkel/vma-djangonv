@@ -97,7 +97,7 @@ secrets-scanning:
     - pip3 install requests 
   script:
     - docker pull hysnsec/trufflehog
-    - docker run --user $(id -u):$(id -g) -v $(pwd):/src --rm hysnsec/trufflehog https://gitlab-temp.conkelhomelab.net/root/django.nv.git --json > /src/trufflehog-output.json
+    - docker run --user $(id -u):$(id -g) -v $(pwd):/tmp --rm hysnsec/trufflehog https://gitlab-temp.conkelhomelab.net/root/django.nv.git --json > /tmp/trufflehog-output.json
   after_script:
     - python3 upload-results.py --host "$DD_HOST" --api_key "$DD_APIKEY"  --engagement_id 1 --product_id 1 --result_file trufflehog-output.json --scanner "Trufflehog Scan"
   artifacts:
