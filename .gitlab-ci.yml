@@ -53,13 +53,30 @@ sca-frontend:
     expire_in: one week
   allow_failure: true #<--- allow the build to fail but don't mark it as such
 
+# Software bill of materials
 sca-syft:
   stage: build
   script:
     - docker pull anchore/syft
-    - docker run --rm -v $(pwd):/src anchore/syft packages alpine:latest -o json --scope all-layers > syft-packages.json
+    # Need to replace alpine:latest with container list
+    - docker run --rm -v $(pwd):/src anchore/syft packages alpine:latest -o json --scope all-layers > syft-sbom.json
   artifacts:
-    paths: [syft-packages.json]
+    paths: [syft-sbom.json]
+    when: always # Archive even on exit code failure
+    expire_in: one week
+  allow_failure: true #<--- allow the build to fail but don't mark it as such
+
+sca-grype:
+  stage: build
+  needs:
+    - sca-syft
+  script:
+    - docker pull anchore/grype
+    - docker run --rm -v $(pwd):/src anchore/grype grype sbom:syft-sbom.json -o json > grype-output.json
+  after_script:
+    - python3 upload-results.py --host "$DD_HOST" --api_key "$DD_APIKEY"  --engagement_id 1 --product_id 1 --result_file grype-output.json --scanner "Anchore Grype"
+  artifacts:
+    paths: [grype-output.json]
     when: always # Archive even on exit code failure
     expire_in: one week
   allow_failure: true #<--- allow the build to fail but don't mark it as such
