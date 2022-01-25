@@ -67,7 +67,7 @@ sca-syft:
   allow_failure: true #<--- allow the build to fail but don't mark it as such
 
 sca-grype:
-  stage: build
+  stage: test
   needs:
     - sca-syft
   before_script:
