@@ -74,7 +74,7 @@ sca-grype:
   script:
     - docker pull anchore/grype
     - ls -al
-    - docker run --rm anchore/grype sbom:./syft-sbom.json -o json | tee grype-output.json
+    - docker run --rm -v $(pwd):/tmp anchore/grype sbom:/tmp/syft-sbom.json -o json | tee grype-output.json
   after_script:
     - python3 upload-results.py --host "$DD_HOST" --api_key "$DD_APIKEY"  --engagement_id 1 --product_id 1 --result_file grype-output.json --scanner "Anchore Grype"
   artifacts:
@@ -82,6 +82,7 @@ sca-grype:
     when: always # Archive even on exit code failure
     expire_in: one week
   allow_failure: true #<--- allow the build to fail but don't mark it as such
+
 sca-backend:
   stage: build
   script:
