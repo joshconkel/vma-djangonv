@@ -59,7 +59,7 @@ sca-syft:
   script:
     - docker pull anchore/syft:v0.35.1
     # Need to replace howiehowerton/djangonv-app-protect with container list
-    - docker run --rm -v $(pwd):/tmp anchore/syft packages anchore/syft -o json --scope all-layers | tee syft-sbom.json
+    - docker run --rm anchore/syft packages anchore/syft -o json --scope all-layers | tee syft-sbom.json
   artifacts:
     paths: [syft-sbom.json]
     when: always # Archive even on exit code failure
@@ -74,7 +74,7 @@ sca-grype:
   script:
     - docker pull anchore/grype
     - ls -al
-    - docker run --rm -v $(pwd):/tmp anchore/grype sbom:syft-sbom.json -o json | tee grype-output.json
+    - docker run --rm anchore/grype sbom:syft-sbom.json -o json | tee grype-output.json
   after_script:
     - python3 upload-results.py --host "$DD_HOST" --api_key "$DD_APIKEY"  --engagement_id 1 --product_id 1 --result_file grype-output.json --scanner "Anchore Grype"
   artifacts:
