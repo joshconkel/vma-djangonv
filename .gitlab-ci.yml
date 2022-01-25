@@ -75,7 +75,7 @@ sca-grype:
     - pip3 install requests 
   script:
     - docker pull anchore/grype
-    - docker run --rm -v $(pwd):/src anchore/grype grype sbom:syft-sbom.json -o json > grype-output.json
+    - docker run --rm -v $(pwd):/src anchore/grype sbom:syft-sbom.json -o json > grype-output.json
   after_script:
     - python3 upload-results.py --host "$DD_HOST" --api_key "$DD_APIKEY"  --engagement_id 1 --product_id 1 --result_file grype-output.json --scanner "Anchore Grype"
   artifacts:
