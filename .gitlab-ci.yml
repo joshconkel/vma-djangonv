@@ -57,9 +57,9 @@ sca-frontend:
 sca-syft:
   stage: build
   script:
-    - docker pull anchore/syft
+    - docker pull anchore/syft:v0.35.1
     # Need to replace howiehowerton/djangonv-app-protect with container list
-    - docker run --rm -v $(pwd):/tmp anchore/syft packages howiehowerton/djangonv-app-protect -o json --scope all-layers | tee syft-sbom.json
+    - docker run --rm -v $(pwd):/tmp anchore/syft packages anchore/syft -o json --scope all-layers | tee syft-sbom.json
   artifacts:
     paths: [syft-sbom.json]
     when: always # Archive even on exit code failure
