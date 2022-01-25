@@ -62,9 +62,9 @@ sca-syft-grype:
   script:
     - docker pull anchore/syft
     # Need to replace alpine:latest with container list
-    - docker run --rm -v $(pwd):/tmp anchore/syft packages alpine:latest -o json --scope all-layers > /tmp/syft-sbom.json
+    - docker run --rm -v $(pwd):/tmp anchore/syft packages alpine:latest -o json --scope all-layers > syft-sbom.json
     - docker pull anchore/grype
-    - docker run --rm -v $(pwd):/tmp anchore/grype sbom:/src/syft-sbom.json -o json > /tmp/grype-output.json
+    - docker run --rm -v $(pwd):/tmp anchore/grype sbom:syft-sbom.json -o json > grype-output.json
   after_script:
     - python3 upload-results.py --host "$DD_HOST" --api_key "$DD_APIKEY"  --engagement_id 1 --product_id 1 --result_file grype-output.json --scanner "Anchore Grype"
   artifacts:
