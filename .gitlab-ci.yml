@@ -68,8 +68,8 @@ sca-syft:
 
 sca-grype:
   stage: test
-  needs:
-    - sca-syft
+  dependencies: 
+    - build
   before_script:
     - apk add python3 py3-pip
     - pip3 install requests 
