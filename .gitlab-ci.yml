@@ -58,8 +58,8 @@ sca-syft:
   stage: build
   script:
     - docker pull anchore/syft
-    # Need to replace alpine:latest with container list
-    - docker run --rm -v $(pwd):/tmp anchore/syft packages alpine:latest -o json --scope all-layers | tee syft-sbom.json
+    # Need to replace howiehowerton/djangonv-app-protect with container list
+    - docker run --rm -v $(pwd):/tmp anchore/syft packages howiehowerton/djangonv-app-protect -o json --scope all-layers | tee syft-sbom.json
   artifacts:
     paths: [syft-sbom.json]
     when: always # Archive even on exit code failure
