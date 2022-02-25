@@ -129,6 +129,24 @@ sonarqube-check:
     - merge_requests
     - master
 
+# SonarQube Reporting
+sonarqube-report:
+  stage: build
+  image: node:alpine3.10
+  before_script:
+    - apk add python3 py3-pip
+    - pip3 install requests 
+  script:
+    - npm install
+    - npm install -g sonar-report # Install sonar-report npm package.
+    # Run HTML Report
+    - sonar-report --sonarurl="https://sonarqube.conkelhomelab.net" --sonartoken="$SONAR_APIKEY" --sonarcomponent="DjangoNV" --sinceleakperiod="false" --allbugs="false" > /tmp/sonar-report.html
+  artifacts:
+    paths: [sonar-report.html]
+    when: always # Archive even on exit code failure
+    expire_in: one week
+  allow_failure: true #<--- allow the build to fail but don't mark it as such
+
 # Git Secrets Scanning
 secrets-scanning:
   stage: build
