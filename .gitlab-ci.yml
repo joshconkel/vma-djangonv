@@ -78,7 +78,7 @@ sbom-generation:
     - docker run --rm anchore/syft packages howiehowerton/djangonv-app-protect:latest -o cyclonedx --scope all-layers | tee cyclonedxfmt-sbom.xml
   after_script:
     - 'python3 upload-results.py --host "$DD_HOST" --api_key "$DD_APIKEY"  --engagement_id 1 --product_id 1 --result_file cyclonedxfmt-sbom.xml --scanner "CycloneDX Scan"'
-    - 'curl -X "POST" "https://dependencytrackapi.slalomsf-lab.com/api/v1/bom" -H "Content-Type: multipart/form-data" -H "X-API-Key: t1FLjr79UtHlaSo0kMBkd82BJshSnCid" -F "project=824434be-235c-4555-ab49-b3a3d1be0f5b" -F "bom=cyclonedxfmt-sbom.xml"'
+    - 'curl -X "POST" "https://dependencytrackapi.slalomsf-lab.com/api/v1/bom" -H "Content-Type: multipart/form-data" -H "X-API-Key: t1FLjr79UtHlaSo0kMBkd82BJshSnCid" -F "project=824434be-235c-4555-ab49-b3a3d1be0f5b" -F "bom=@cyclonedxfmt-sbom.xml"'
 
   artifacts:
     paths: [cyclonedxfmt-sbom.xml]
